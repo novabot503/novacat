@@ -1,0 +1,2 @@
+# novacat
+Website kecerdasan buatan 📊
