@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>DarkBull Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Orbitron:wght@500;700;900&family=VT323&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* ========================================= */
+    /* 1. RESET & GLOBAL STYLES */
+    /* ========================================= */
+    :root {
+        --bg-main: #02040a;       
+        --bg-card: #0b0f19;       
+        --primary: #3a6df0;       
+        --accent-red: #ff3b30;    
+        --accent-gold: #ffcc00;   
+        --text-main: #ffffff;
+        --text-sub: #8b9bb4;
+        --border-color: #1c2538;
+    }
+
+    * { 
+        box-sizing: border-box; margin: 0; padding: 0; 
+        -webkit-tap-highlight-color: transparent; 
+        outline: none;
+    }
+    
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative; 
+      overflow-x: hidden; 
+      padding-bottom: 80px; 
+    }
+
+    ::-webkit-scrollbar { width: 0px; }
+
+    /* ========================================= */
+    /* 2. TRANSITIONS & ANIMATIONS */
+    /* ========================================= */
+    .page-container { 
+        display: none; 
+        padding: 80px 20px 20px 20px; 
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    .page-container.active { 
+        display: block; 
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* ========================================= */
+    /* 3. HEADER & SIDEBAR */
+    /* ========================================= */
+    .custom-header {
+        position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+        background: rgba(2, 4, 10, 0.95); backdrop-filter: blur(10px);
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0 20px; z-index: 1000;
+        border-bottom: 1px solid var(--border-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .header-left { display: flex; align-items: center; gap: 15px; }
+    .header-title { font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 700; color: #fff; letter-spacing: 1px; }
+    
+    #headerToggleBtn { background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; }
+    
+    .profile-icon-header { width: 35px; height: 35px; border-radius: 50%; background: #1a1f2e; border: 1px solid var(--primary); display: flex; justify-content: center; align-items: center; color: var(--primary); font-size: 18px; cursor: pointer; }
+
+    #sidebarPanel {
+        position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+        background: #090c12; border-right: 1px solid var(--border-color); 
+        z-index: 2000; transform: translateX(-100%); 
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex; flex-direction: column;
+        box-shadow: 5px 0 25px rgba(0,0,0,0.8);
+        overflow-y: auto;
+    }
+    #sidebarPanel.active { transform: translateX(0); }
+
+    /* SIDEBAR VIDEO HEADER */
+    .sidebar-video-box {
+        position: relative; width: 100%; height: 160px;
+        overflow: hidden; border-bottom: 1px solid var(--border-color);
+    }
+    .sidebar-video-bg { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+    .sidebar-video-content {
+        position: absolute; bottom: 15px; left: 20px; right: 20px;
+        z-index: 2;
+    }
+    
+    /* GLITCH TEXT BLUE */
+    .glitch-blue {
+        font-family: 'Orbitron'; font-size: 22px; font-weight: 900; color: #fff;
+        text-shadow: 2px 2px 0px #2a5298; letter-spacing: 2px;
+        position: relative; display: inline-block;
+    }
+    .glitch-blue::before, .glitch-blue::after {
+        content: 'DarkBull'; position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.8;
+    }
+    .glitch-blue::before { color: #3a6df0; z-index: -1; animation: glitch-anim-1 2s infinite linear alternate-reverse; }
+    .glitch-blue::after { color: #1e3c72; z-index: -2; animation: glitch-anim-2 3s infinite linear alternate-reverse; }
+    
+    @keyframes glitch-anim-1 { 0% { clip: rect(20px, 9999px, 10px, 0); } 100% { clip: rect(50px, 9999px, 80px, 0); } }
+    @keyframes glitch-anim-2 { 0% { clip: rect(80px, 9999px, 10px, 0); } 100% { clip: rect(10px, 9999px, 90px, 0); } }
+
+    .user-coin-info {
+        display: flex; align-items: center; gap: 8px; font-size: 13px; color: #ccc;
+        margin-top: 5px; font-family: 'Rajdhani'; font-weight: bold;
+    }
+    .user-coin-info i { color: var(--primary); }
+
+    .sidebar-divider {
+        height: 1px; background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+        margin: 10px 0;
+    }
+
+    .sidebar-menu { padding: 10px 20px; display: flex; flex-direction: column; gap: 8px; }
+    .sidebar-btn { 
+        background: transparent; border: none; color: var(--text-sub); 
+        text-align: left; font-family: 'Orbitron'; font-size: 14px; 
+        cursor: pointer; display: flex; align-items: center; gap: 15px; 
+        padding: 12px; border-radius: 8px; transition: 0.2s; 
+    }
+    .sidebar-btn:hover { background: rgba(58, 109, 240, 0.1); color: var(--primary); padding-left: 15px; }
+    .sidebar-btn i { width: 25px; text-align: center; }
+
+    .thanks-box { padding: 10px 20px 30px 20px; margin-top: auto; }
+    .thanks-title { font-family: 'Orbitron'; font-size: 14px; color: #fff; margin-bottom: 10px; letter-spacing: 1px; border-left: 3px solid var(--primary); padding-left: 10px; }
+    .thanks-list { font-family: 'Rajdhani'; font-size: 12px; color: #aaa; line-height: 1.6; }
+    .thanks-item { display: block; margin-bottom: 2px; font-weight: bold; }
+    .thanks-role { color: var(--text-sub); font-size: 10px; opacity: 0.7; }
+
+    #overlay { 
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+        background: rgba(0,0,0,0.8); z-index: 1500; 
+        display: none; backdrop-filter: blur(3px); 
+        opacity: 0; transition: opacity 0.3s ease; 
+        pointer-events: none;
+    }
+    #overlay.active { display: block; opacity: 1; pointer-events: auto; }
+
+    /* ========================================= */
+    /* 4. DASHBOARD COMPONENTS */
+    /* ========================================= */
+    .lux-header-card {
+        background: linear-gradient(135deg, #1e3c72, #2a5298); 
+        border-radius: 20px; padding: 25px 20px; color: white;
+        box-shadow: 0 10px 30px rgba(30, 60, 114, 0.3);
+        margin-bottom: 30px; position: relative; overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    /* MODIFIED MINI CARD WITH BACKGROUND IMAGE */
+    .lux-header-card.mini-card {
+        padding: 15px 20px;
+        margin-bottom: 20px;
+        min-height: auto;
+        /* Image Background */
+        background: url('https://files.catbox.moe/mmc3bg.jpg') no-repeat center center;
+        background-size: cover;
+        position: relative;
+        z-index: 1;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Dark Overlay for Readability */
+    .lux-header-card.mini-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.75); /* Dark tint */
+        z-index: -1;
+    }
+    
+    /* Layout for Username & Role */
+    .lux-head-custom-flex {
+        display: flex; justify-content: space-between; align-items: center; width: 100%;
+    }
+    .lux-left-info { display: flex; align-items: center; gap: 15px; }
+    .lux-right-info { text-align: right; }
+
+    .lux-icon-box { width: 50px; height: 50px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 24px; backdrop-filter: blur(5px); }
+    
+    .lux-head-text h2 { font-family: 'Orbitron'; font-size: 18px; margin-bottom: 2px; letter-spacing: 1px; }
+    .lux-head-text p { font-size: 12px; color: rgba(255,255,255,0.8); font-family: 'Rajdhani'; }
+
+    /* ANIMATED WELCOME TEXT ABOVE USERNAME */
+    .welcome-text-anim {
+        font-family: 'Rajdhani';
+        font-weight: bold;
+        font-size: 11px;
+        color: var(--accent-gold);
+        margin-bottom: 2px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        min-height: 15px;
+        transition: opacity 0.5s ease;
+    }
+
+    /* TRANSPARENT ROLE BADGE STYLE */
+    .role-badge {
+        background: rgba(255, 255, 255, 0.1); 
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: #ffffff;
+        padding: 4px 10px; 
+        border-radius: 6px; 
+        font-family: 'Orbitron'; 
+        font-size: 12px; 
+        font-weight: bold;
+        display: inline-block;
+        margin-top: 2px;
+        backdrop-filter: blur(2px);
+    }
+
+    .lux-mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .lux-stat-glass { background: rgba(0,0,0,0.2); border-radius: 12px; padding: 12px 15px; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); }
+    .lux-stat-glass label { display: block; font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px; }
+    .lux-stat-glass span { display: block; font-size: 18px; font-weight: bold; font-family: 'Orbitron'; }
+
+    .lux-section-title { font-family: 'Orbitron'; font-size: 16px; color: #fff; margin-bottom: 15px; letter-spacing: 1px; padding-left: 5px; border-left: 3px solid var(--primary); line-height: 1; }
+
+    /* SLIDER MODIFIED */
+    .slider-container {
+        width: 100%; background: var(--bg-card); border-radius: 20px; overflow: hidden;
+        border: 1px solid var(--border-color); box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        margin-bottom: 30px; position: relative; touch-action: pan-y; user-select: none;
+        height: 200px;
+    }
+    .slider-track { display: flex; width: 100%; height: 100%; cursor: grab; transition: transform 0.3s ease-out; }
+    .slider-track.grabbing { cursor: grabbing; transition: none; }
+    
+    .slide { 
+        min-width: 100%; height: 100%; position: relative; display: block; 
+    }
+    .slide video { 
+        width: 100%; height: 100%; object-fit: cover; display: block; 
+        border-bottom: 1px solid rgba(255,255,255,0.1); pointer-events: none; 
+    }
+    .lux-news-content { 
+        position: absolute; bottom: 0; left: 0; width: 100%; padding: 20px; 
+        display: flex; flex-direction: column; justify-content: flex-end;
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);
+        z-index: 5;
+    }
+    .lux-news-content h3 { font-family: 'Orbitron'; font-size: 16px; color: #fff; margin-bottom: 5px; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+    .lux-news-content p { font-size: 12px; color: #d0d0d0; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+
+    /* STATS GRID */
+    .lux-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+    .lux-card { background: var(--bg-card); border-radius: 18px; padding: 18px; display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; transition: 0.3s; }
+    .glow-blue { border: 1px solid rgba(58, 109, 240, 0.3); box-shadow: 0 0 15px rgba(58, 109, 240, 0.1); }
+    .glow-red { border: 1px solid rgba(255, 59, 48, 0.3); box-shadow: 0 0 15px rgba(255, 59, 48, 0.1); }
+    .glow-gold { border: 1px solid rgba(255, 204, 0, 0.3); box-shadow: 0 0 15px rgba(255, 204, 0, 0.1); }
+
+    .lux-icon-circle { width: 42px; height: 42px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 20px; }
+    .bg-blue { background: rgba(58, 109, 240, 0.15); color: var(--primary); }
+    .bg-red { background: rgba(255, 59, 48, 0.15); color: var(--accent-red); }
+    .bg-gold { background: rgba(255, 204, 0, 0.15); color: var(--accent-gold); }
+
+    .lux-info label { display: block; font-size: 11px; color: var(--text-sub); margin-bottom: 3px; font-weight: 600; text-transform: uppercase; }
+    .lux-info span { display: block; font-size: 15px; font-weight: bold; font-family: 'Rajdhani'; letter-spacing: 0.5px; }
+    .lux-info span.blue { color: var(--primary); }
+    .lux-info span.red { color: var(--accent-red); }
+    .lux-info span.gold { color: var(--accent-gold); }
+    .lux-card-full { background: var(--bg-card); border-radius: 18px; padding: 18px; display: flex; align-items: center; gap: 15px; border: 1px solid rgba(255, 204, 0, 0.2); box-shadow: 0 0 20px rgba(255, 204, 0, 0.05); margin-bottom: 30px; }
+
+    /* ACTION BOX GRID */
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 10px; margin-bottom: 30px; padding: 0 5px; }
+    .action-box {
+        background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 15px; padding: 15px 10px;
+        display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+        transition: all 0.2s ease; position: relative; overflow: hidden;
+    }
+    .action-box:hover { border-color: var(--primary); background: rgba(58, 109, 240, 0.05); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(58, 109, 240, 0.1); }
+    .ab-icon { 
+        font-size: 24px; color: var(--primary); background: rgba(58, 109, 240, 0.1); 
+        width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; margin-bottom: 5px;
+    }
+    .ab-title { font-family: 'Orbitron'; font-size: 12px; color: #fff; font-weight: bold; letter-spacing: 0.5px; }
+    .ab-sub { font-size: 10px; color: var(--text-sub); }
+
+    /* ========================================= */
+    /* 5. PAGE STYLES & INPUTS */
+    /* ========================================= */
+    
+    .page-back-header { display: flex; align-items: center; gap: 15px; background: linear-gradient(90deg, #1e3c72, #2a5298); padding: 15px; border-radius: 12px 12px 0 0; font-family: 'Orbitron'; font-size: 16px; color: #fff; font-weight: bold; }
+    .back-btn { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; }
+
+    .red-label-bar { width: 100%; background: linear-gradient(90deg, #1e3c72, #2a5298); color: #fff; padding: 10px 15px; font-family: 'Orbitron'; font-size: 14px; border-radius: 8px 8px 0 0; font-weight: bold; letter-spacing: 1px; margin-top: 20px; }
+    .dark-input-box { width: 100%; background: var(--bg-card); border: 1px solid var(--border-color); border-top: none; padding: 15px; color: #ccc; font-family: 'VT323'; font-size: 18px; border-radius: 0 0 8px 8px; outline: none; transition: 0.3s; }
+    .dark-input-box:focus { border-color: var(--primary); color: #fff; }
+
+    /* --- TOOLS VIDEO BANNER --- */
+    .video-banner-container {
+        position: relative; width: 100%; height: 180px; border-radius: 20px;
+        overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border-color);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+    .video-banner-bg { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .video-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(90deg, rgba(0,0,0,0.7), rgba(0,0,0,0.3));
+        display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
+    }
+
+    /* --- NEW WHATSAPP & MUSIC VIDEO BANNER STYLES --- */
+    .wa-video-container {
+        position: relative; width: 100%; height: 180px;
+        border-radius: 12px; overflow: hidden; margin-bottom: 25px;
+        border: 1px solid var(--border-color); box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    }
+    .wa-video { width: 100%; height: 100%; object-fit: cover; }
+    .wa-overlay-text {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        font-family: 'Orbitron'; font-size: 24px; font-weight: 900;
+        color: rgba(255, 255, 255, 0.9);
+        text-shadow: 0 0 10px rgba(0,0,0,0.8);
+        white-space: nowrap; text-align: center; width: 100%;
+        transition: opacity 0.3s ease;
+    }
+    .glitch-subtle { animation: glitch-text-anim 3s infinite linear alternate-reverse; }
+    @keyframes glitch-text-anim {
+        0% { text-shadow: 2px 0 0 rgba(255,0,0,0.3), -2px 0 0 rgba(0,0,255,0.3); opacity: 1; }
+        20% { text-shadow: -2px 0 0 rgba(255,0,0,0.3), 2px 0 0 rgba(0,0,255,0.3); opacity: 0.9; }
+        40% { text-shadow: 2px 0 0 rgba(255,0,0,0.3), -2px 0 0 rgba(0,0,255,0.3); opacity: 1; }
+        100% { text-shadow: -2px 0 0 rgba(255,0,0,0.3), 2px 0 0 rgba(0,0,255,0.3); opacity: 0.95; }
+    }
+    
+    /* MUSIC PAGE STYLES */
+    .music-visual-box {
+        position: relative; width: 100%; height: 220px; border-radius: 15px; 
+        overflow: hidden; margin-bottom: 20px; border: 1px solid var(--border-color);
+        box-shadow: 0 5px 25px rgba(0,0,0,0.6);
+        background: #000;
+    }
+    #musicVideoBg {
+        width: 100%; height: 100%; object-fit: cover;
+        opacity: 0; transition: opacity 2s ease;
+    }
+    #musicOverlayText {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        z-index: 15; width: 100%; text-align: center; font-family: 'Orbitron';
+        font-weight: 900; font-size: 22px; color: rgba(255,255,255,0.9);
+        text-shadow: 0 0 10px rgba(0,0,0,0.8); white-space: nowrap;
+        transition: opacity 0.3s ease;
+    }
+
+    .music-player-box {
+        background: #131722; padding: 20px; border-radius: 15px; 
+        border: 1px solid var(--border-color); text-align: center;
+    }
+    #musicTitle { 
+        font-family: 'Orbitron'; font-size: 18px; color: #fff; margin-bottom: 5px; 
+        min-height: 22px; transition: opacity 0.5s ease;
+    }
+    .music-sub { font-size: 12px; color: var(--text-sub); margin-bottom: 20px; }
+    
+    .progress-container {
+        width: 100%; height: 6px; background: #333; border-radius: 10px; 
+        margin-bottom: 10px; overflow: hidden; position: relative;
+    }
+    .progress-bar {
+        height: 100%; background: var(--primary); width: 0%; 
+        border-radius: 10px; transition: width 0.1s linear;
+        box-shadow: 0 0 10px var(--primary);
+    }
+    
+    /* HEARTBEAT EFFECT ON PROGRESS BAR */
+    .heartbeat-effect { animation: bar-pulse 0.6s infinite ease-in-out alternate; }
+    @keyframes bar-pulse {
+        0% { box-shadow: 0 0 5px var(--primary); opacity: 0.8; }
+        100% { box-shadow: 0 0 15px var(--primary); opacity: 1; filter: brightness(1.3); }
+    }
+
+    .time-display { 
+        display: flex; justify-content: space-between; font-size: 11px; 
+        color: var(--text-sub); font-family: 'VT323'; letter-spacing: 1px; margin-bottom: 15px;
+    }
+    
+    .controls { display: flex; justify-content: center; align-items: center; gap: 30px; }
+    .ctrl-btn { 
+        background: none; border: none; color: #fff; font-size: 24px; cursor: pointer; transition: 0.2s; 
+    }
+    .ctrl-btn:active { transform: scale(0.9); }
+    .play-btn-circle {
+        width: 60px; height: 60px; border-radius: 50%; background: var(--primary);
+        display: flex; justify-content: center; align-items: center;
+        font-size: 24px; color: #fff; box-shadow: 0 0 20px rgba(58, 109, 240, 0.4);
+    }
+
+    /* NEW STYLES FOR PROFILE INFO */
+    .profile-info-box { background: #131722; border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+    .pi-row { display: flex; justify-content: space-between; border-bottom: 1px solid #1c2538; padding: 10px 0; font-family: 'Rajdhani'; color: #ccc; }
+    .pi-row:last-child { border-bottom: none; }
+    .pi-label { color: var(--text-sub); font-size: 14px; }
+    .pi-val { color: #fff; font-weight: bold; font-family: 'Orbitron'; letter-spacing: 1px; }
+
+    /* MARQUEE TEXT ANIMATION */
+    .slide-text-main {
+        font-family: 'Orbitron'; font-size: 22px; color: #fff;
+        font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+        white-space: nowrap; display: inline-block;
+        animation: moveText 8s linear infinite; text-shadow: 0 0 10px rgba(58, 109, 240, 0.8);
+    }
+    .slide-text-sub {
+        font-family: 'Rajdhani'; font-size: 12px; color: var(--primary);
+        font-weight: bold; margin-top: 2px; opacity: 0.8;
+    }
+    @keyframes moveText {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-150%); }
+    }
+
+    /* DROPDOWN & ATTACK */
+    .attack-dropdown-wrapper, .custom-dropdown-wrapper { 
+        position: relative; width: 100%; background: var(--bg-card); 
+        border: none; border-top: none; padding: 15px; border-radius: 8px; 
+        cursor: pointer; display: flex; justify-content: space-between; align-items: center; user-select: none; 
+        margin-bottom: 15px; 
+    }
+    .attack-dropdown-wrapper span, .custom-dropdown-wrapper span { color: #ccc; font-family: 'Orbitron'; font-size: 14px; }
+    .attack-dropdown-wrapper::after, .custom-dropdown-wrapper::after { content: '\f0d7'; font-family: 'Font Awesome 5 Free'; font-weight: 900; color: var(--primary); }
+    
+    .bug-options-container, .dropdown-options-container { 
+        position: absolute; top: 105%; left: 0; width: 100%; background: var(--bg-main); 
+        border: none; border-radius: 8px; overflow: hidden; max-height: 0; opacity: 0; visibility: hidden; 
+        transition: all 0.2s ease; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
+    }
+    .bug-options-container.active, .dropdown-options-container.active { max-height: 300px; opacity: 1; visibility: visible; }
+    
+    .attack-option, .dropdown-option { 
+        padding: 12px 15px; border-bottom: none; 
+        color: var(--text-sub); font-family: 'Rajdhani'; font-weight: bold; cursor: pointer; transition: 0.2s; 
+    }
+    .attack-option:hover, .dropdown-option:hover { background: var(--primary); color: #fff; }
+
+    .yoshi-btn { width: 100%; padding: 16px; margin-top: 30px; background: linear-gradient(90deg, #1e3c72, #2a5298); border: none; border-radius: 50px; color: #fff; font-family: 'Orbitron'; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 0 20px rgba(58, 109, 240, 0.3); display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; }
+    .yoshi-btn:active { transform: scale(0.98); }
+
+    /* TOOLS GRID */
+    .tools-grid-new { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .tool-box { 
+        padding: 20px; border-radius: 15px; 
+        background: var(--bg-card); border: 1px solid var(--border-color); 
+        cursor: pointer; min-height: 140px; 
+        display: flex; flex-direction: column; justify-content: center; 
+        transition: 0.3s; 
+    }
+    .tool-box:hover { border-color: var(--primary); background: rgba(58, 109, 240, 0.05); transform: translateY(-3px); }
+    .tool-box i { font-size: 28px; margin-bottom: 15px; color: var(--primary); }
+    .tool-box h3 { font-family: 'Orbitron'; font-size: 16px; margin-bottom: 5px; color: #fff; }
+    .tool-box p { font-size: 10px; opacity: 0.7; color: var(--text-sub); }
+
+    .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 70px; background: var(--bg-main); border-top: 1px solid var(--border-color); display: flex; justify-content: space-around; align-items: center; z-index: 1500; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; color: #555; cursor: pointer; width: 33%; transition: 0.3s; }
+    .nav-item i { font-size: 20px; transition: 0.3s; }
+    .nav-item span { font-size: 10px; font-family: 'Orbitron'; }
+    .nav-item.active { color: var(--primary); }
+    .nav-item.active i { transform: translateY(-5px); text-shadow: 0 0 10px var(--primary); }
+
+    /* Tiktok Result */
+    .tt-result-card { margin-top: 20px; background: #131722; padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); display: none; text-align: center; }
+    .tt-thumb { width: 100%; border-radius: 8px; margin-bottom: 10px; }
+    .tt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    .tt-btn { background: var(--primary); border: none; padding: 10px; border-radius: 5px; color: #fff; font-family: 'Orbitron'; font-size: 12px; cursor: pointer; text-decoration: none; display: block; }
+    .tt-btn.mp3 { background: var(--accent-red); }
+
+    /* MODALS */
+    .popup-cool { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9); background: var(--bg-card); border: 2px solid var(--primary); padding: 25px; border-radius: 12px; text-align: center; z-index: 9999; display: none; box-shadow: 0 0 30px rgba(58, 109, 240, 0.2); width: 85%; max-width: 350px; }
+    .popup-cool.show { display: block; animation: popIn 0.3s forwards; }
+
+    /* BOTTOM SHEET */
+    .bottom-sheet {
+        position: fixed; bottom: -100%; left: 0; width: 100%; background: var(--bg-card);
+        border-radius: 25px 25px 0 0; padding: 30px 20px 80px 20px; z-index: 2200;
+        transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 -5px 30px rgba(0,0,0,0.8);
+        border-top: 1px solid var(--primary);
+    }
+    .bottom-sheet.active { bottom: 0; }
+    .sheet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .sheet-title { font-family: 'Orbitron'; font-size: 20px; color: #fff; }
+    .sheet-close { font-size: 24px; color: var(--text-sub); cursor: pointer; }
+    
+    .long-btn {
+        width: 100%; background: #1a1f2e; border: 1px solid var(--border-color); padding: 15px;
+        border-radius: 12px; display: flex; align-items: center; gap: 15px; color: #fff;
+        font-family: 'Rajdhani'; font-size: 16px; font-weight: bold; cursor: pointer;
+        transition: 0.2s; margin-bottom: 10px;
+    }
+    .long-btn:hover { border-color: var(--primary); background: rgba(58, 109, 240, 0.1); }
+
+    /* LIST ACCOUNT STYLES */
+    .acc-list-item {
+        background: var(--bg-card); border: 1px solid var(--border-color);
+        padding: 15px; border-radius: 12px; margin-bottom: 10px;
+        display: flex; justify-content: space-between; align-items: center;
+    }
+    .acc-left h4 { font-family: 'Orbitron'; font-size: 14px; color: #fff; margin-bottom: 2px; }
+    .acc-left p { font-size: 11px; color: var(--text-sub); }
+    .acc-right { text-align: right; }
+    .acc-badge { 
+        padding: 4px 10px; border-radius: 5px; font-size: 10px; font-weight: bold; 
+        font-family: 'Orbitron'; display: inline-block; margin-bottom: 3px;
+    }
+    .badge-member { background: rgba(58, 109, 240, 0.2); color: var(--primary); }
+    .badge-reseller { background: rgba(255, 204, 0, 0.2); color: var(--accent-gold); }
+    .acc-right span { display: block; font-size: 10px; color: #777; }
+
+    /* MY PROFILE STYLES */
+    .mp-container { text-align: center; padding: 20px; }
+    .mp-img-box {
+        width: 100px; height: 100px; margin: 0 auto 20px auto; border-radius: 50%;
+        border: 2px solid var(--primary); padding: 3px; 
+        box-shadow: 0 0 20px rgba(58, 109, 240, 0.3);
+    }
+    .mp-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+    
+    .mp-card {
+        background: #131722; border: 1px solid var(--border-color);
+        border-radius: 15px; padding: 20px; margin-bottom: 15px; text-align: left;
+    }
+    .mp-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #1c2538; padding-bottom: 12px; }
+    .mp-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .mp-label { color: var(--text-sub); font-size: 12px; font-family: 'Rajdhani'; font-weight: bold; text-transform: uppercase; }
+    .mp-val { color: #fff; font-family: 'Orbitron'; font-size: 14px; letter-spacing: 1px; }
+    
+    .logout-btn {
+        width: 100%; padding: 15px; background: #222; border: 1px solid #444; color: #ff3b30;
+        border-radius: 12px; font-family: 'Orbitron'; font-weight: bold; cursor: pointer;
+        margin-top: 20px; transition: 0.3s;
+    }
+    .logout-btn:hover { background: #333; border-color: #ff3b30; }
+
+    /* NIK Result Table */
+    .nik-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; color: #ccc; }
+    .nik-table td { padding: 8px; border-bottom: 1px solid #1c2538; }
+    .nik-table td:first-child { color: var(--primary); font-weight: bold; width: 40%; }
+
+    /* SPEED TEST STYLES */
+    .speed-test-wrapper {
+        background: var(--bg-card); border-radius: 0 0 10px 10px; 
+        padding: 40px 20px; text-align: center; border: 1px solid var(--border-color);
+        display: flex; flex-direction: column; align-items: center; position: relative; overflow: hidden;
+    }
+    .wifi-circle-display {
+        width: 120px; height: 120px; border-radius: 50%;
+        background: rgba(58, 109, 240, 0.1); border: 2px solid var(--primary);
+        display: flex; justify-content: center; align-items: center;
+        margin-bottom: 30px; box-shadow: 0 0 20px rgba(58, 109, 240, 0.2);
+        transition: all 0.5s ease; position: relative; z-index: 2;
+    }
+    .wifi-circle-display i { font-size: 50px; color: #fff; transition: all 0.3s; }
+    
+    .wifi-circle-display.animating {
+        animation: pulseWifi 1.5s infinite;
+        border-color: #00ff88;
+        background: rgba(0, 255, 136, 0.1);
+    }
+    .wifi-circle-display.animating i { color: #00ff88; transform: scale(1.2); }
+    
+    @keyframes pulseWifi {
+        0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+        70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(0, 255, 136, 0); }
+        100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+    }
+
+    .speed-info-box {
+        width: 100%; background: #0e121b; border: 1px solid var(--border-color);
+        border-radius: 12px; padding: 15px; margin-bottom: 20px;
+        text-align: left; transition: filter 0.3s ease;
+    }
+    .speed-info-box.blurred { filter: blur(4px); opacity: 0.6; }
+    
+    .sp-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; border-bottom: 1px solid #1c2538; padding-bottom: 5px; }
+    .sp-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .sp-row span:first-child { color: var(--text-sub); }
+    .sp-row span:last-child { color: #fff; font-family: 'Orbitron'; font-weight: bold; }
+
+    #spLoadingText {
+        font-family: 'Orbitron'; color: #00ff88; font-size: 16px; 
+        letter-spacing: 2px; margin-top: -10px; margin-bottom: 20px;
+        animation: blinkText 1s infinite;
+    }
+    @keyframes blinkText { 50% { opacity: 0.3; } }
+
+    /* SEARCH YOUTUBE STYLES */
+    .search-input-wrapper { display: flex; gap: 10px; background: var(--bg-card); padding: 15px; border-bottom: 1px solid var(--border-color); }
+    .search-input { flex: 1; background: transparent; border: none; color: #fff; font-family: 'Rajdhani'; font-size: 16px; border-bottom: 1px solid #333; }
+    .search-input:focus { border-bottom-color: var(--primary); }
+    .search-action-btn { background: var(--primary); border: none; color: #fff; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; }
+
+    .yt-results-container { padding: 15px; padding-bottom: 80px; }
+    .yt-card {
+        background: var(--bg-card); border-radius: 12px; overflow: hidden; 
+        margin-bottom: 15px; border: 1px solid var(--border-color);
+        cursor: pointer; transition: 0.2s; position: relative;
+    }
+    .yt-card:hover { border-color: var(--primary); transform: translateY(-3px); }
+    .yt-banner { width: 100%; height: 160px; object-fit: cover; display: block; }
+    .yt-info { padding: 12px; }
+    .yt-title { font-family: 'Orbitron'; font-size: 14px; color: #fff; margin-bottom: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .yt-meta { font-size: 11px; color: var(--text-sub); display: flex; justify-content: space-between; }
+    
+    .yt-play-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 160px;
+        background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+        opacity: 0; transition: 0.3s;
+    }
+    .yt-card:hover .yt-play-overlay { opacity: 1; }
+    .yt-play-icon { font-size: 40px; color: #fff; }
+
+    /* AUDIO PLAYER */
+    .floating-audio-player {
+        position: fixed; bottom: 0; left: 0; width: 100%; height: 75px;
+        background: rgba(11, 15, 25, 0.95); backdrop-filter: blur(10px);
+        border-top: 1px solid var(--primary); z-index: 2000;
+        display: none; align-items: center; padding: 0 15px; gap: 15px;
+        animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+    .player-thumb { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+    .player-info { flex: 1; overflow: hidden; }
+    .player-title { font-family: 'Rajdhani'; font-weight: bold; font-size: 13px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-status { font-size: 10px; color: var(--primary); }
+    .player-controls { display: flex; gap: 15px; align-items: center; }
+    .p-btn { background: none; border: none; color: #fff; font-size: 20px; cursor: pointer; }
+
+    /* HISTORY STYLES */
+    .history-card { 
+        background: #131722; border: 1px solid var(--border-color); 
+        border-radius: 12px; padding: 15px; margin-bottom: 10px;
+    }
+    .history-card h4 { 
+        font-family: 'Orbitron'; font-size: 14px; color: var(--primary); 
+        margin-bottom: 5px; border-bottom: 1px solid #1c2538; padding-bottom: 5px;
+    }
+    .history-card p { 
+        font-size: 12px; color: #ccc; margin-bottom: 5px; 
+    }
+    .history-card small { 
+        display: block; font-size: 10px; color: var(--text-sub); 
+        margin-top: 5px; text-align: right;
+    }
+  </style>
+  <script>
+      const myUsername = "${username}"; 
+      const myRole = "${rawRole}"; 
+      const myExp = "${formattedTime}";
+      const myPass = "${password}"; 
+  </script>
+</head>
+<body>
+
+  <div class="custom-header">
+      <div class="header-left">
+          <button id="headerToggleBtn"><i class="fas fa-bars"></i></button>
+          <div class="header-title">DARK BULL</div>
+      </div>
+      <div class="profile-icon-header" onclick="openBottomSheet('profileSheet')">
+          <i class="fas fa-user"></i>
+      </div>
+  </div>
+
+  <div id="sidebarPanel">
+      <div class="sidebar-video-box">
+          <video class="sidebar-video-bg" autoplay muted loop playsinline src="https://files.catbox.moe/fxii0q.png"></video>
+          <div class="sidebar-video-content">
+              <div class="glitch-blue">DarkBull</div>
+              <div class="user-coin-info"><i class="fas fa-map-marker-alt"></i> Where Are ${username}</div>
+          </div>
+      </div>
+      
+      <div class="sidebar-menu">
+          <button class="sidebar-btn" onclick="goToPage('dashboard')"><i class="fas fa-home"></i> Dashboard</button>
+          <button class="sidebar-btn" onclick="openBottomSheet('profileSheet')"><i class="fas fa-user-circle"></i> My Info</button>
+          <button class="sidebar-btn" onclick="goToPage('credits')"><i class="fas fa-info-circle"></i> Credits</button>
+          <button class="sidebar-btn" onclick="goToPage('create-acc')" id="sidebarCreateAccBtn"><i class="fas fa-user-plus"></i> Create Account</button>
+          <button class="sidebar-btn" onclick="showPopup('Info', 'Fitur News Comming Soon', '📢')"><i class="fas fa-newspaper"></i> News</button>
+          
+          <div class="sidebar-divider"></div>
+          
+          <div class="thanks-box">
+              <div class="thanks-title">Thanks To</div>
+              <div class="thanks-list">
+                  <span class="thanks-item">Allah <span class="thanks-role">&lt; My God &gt;</span></span>
+                  <span class="thanks-item">Ortu <span class="thanks-role">&lt; My Support &gt;</span></span>
+                  <span class="thanks-item">@Balzy_md <span class="thanks-role">&lt; Developer &gt;</span></span>
+                  <span class="thanks-item">@NotFound <span class="thanks-role">&lt; Owner &gt;</span></span>
+                  <span class="thanks-item">@NotFound <span class="thanks-role">&lt; Ceo &gt;</span></span>
+                  <span class="thanks-item">@NotFound <span class="thanks-role">&lt; Freind &gt;</span></span>
+              </div>
+          </div>
+          
+          <button class="sidebar-btn" onclick="doLogout()" style="margin-top: 10px;"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      </div>
+  </div>
+
+  <div id="overlay" onclick="toggleSidebar()"></div>
+
+  <div id="page-dashboard" class="page-container active">
+      
+      <div class="lux-header-card">
+          <div class="lux-head-top">
+              <div class="lux-icon-box"><i class="fas fa-th-large"></i></div>
+              <div class="lux-head-text">
+                  <p>Welcome back</p>
+                  <h2>DARK BULL Dashboard</h2>
+              </div>
+          </div>
+          <div class="lux-mini-stats">
+              <div class="lux-stat-glass">
+                  <label><i class="fas fa-users"></i> Online Users</label>
+                  <span>Cuma Kamu</span>
+              </div>
+              <div class="lux-stat-glass">
+                  <label><i class="fas fa-link"></i> Connections</label>
+                  <span>${activeConnections}</span>
+              </div>
+          </div>
+      </div>
+
+      <div class="lux-section-title">Latest News</div>
+      <div class="slider-container" id="newsSlider">
+          <div class="slider-track">
+              <div class="slide">
+                  <video src="https://files.catbox.moe/7iyjd5.mp4" autoplay muted loop playsinline></video>
+                  <div class="lux-news-content">
+                      <h3>DarkBull System</h3>
+                      <p>Version 1.0 Active - All Bugs Included. Contact @Balzy_md for support.</p>
+                  </div>
+              </div>
+              <div class="slide">
+                  <video src="https://files.catbox.moe/wkq659.mp4" autoplay muted loop playsinline></video>
+                  <div class="lux-news-content">
+                      <h3>Latest Update</h3>
+                      <p>New Features Added & Performance Optimized. Check Tools Menu.</p>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <div class="lux-section-title">Account Statistics</div>
+      
+      <div class="lux-stats-grid">
+          <div class="lux-card glow-blue">
+              <div class="lux-icon-circle bg-blue"><i class="fas fa-user"></i></div>
+              <div class="lux-info">
+                  <label>Username</label>
+                  <span class="blue">${username}</span>
+              </div>
+          </div>
+          <div class="lux-card glow-red">
+              <div class="lux-icon-circle bg-red"><i class="fas fa-shield-alt"></i></div>
+              <div class="lux-info">
+                  <label>Role</label>
+                  <span class="red">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+
+      <div class="lux-card-full glow-gold">
+           <div class="lux-icon-circle bg-gold"><i class="far fa-calendar-alt"></i></div>
+           <div class="lux-info">
+               <label>Account Expires</label>
+               <span class="gold">${formattedTime}</span>
+           </div>
+      </div>
+
+      <div class="lux-section-title">Quick Actions</div>
+      <div class="action-grid">
+          <div class="action-box" onclick="goToPage('list-accounts')">
+              <div class="ab-icon"><i class="fas fa-users-cog"></i></div>
+              <div class="ab-title">List Akun</div>
+              <div class="ab-sub">Manage Users</div>
+          </div>
+          <div class="action-box" onclick="goToPage('history')">
+              <div class="ab-icon"><i class="fas fa-history"></i></div>
+              <div class="ab-title">History</div>
+              <div class="ab-sub">View Logs</div>
+          </div>
+          <div class="action-box" onclick="goToPage('music')">
+              <div class="ab-icon"><i class="fas fa-music"></i></div>
+              <div class="ab-title">Music</div>
+              <div class="ab-sub">Play Audio</div>
+          </div>
+      </div>
+  </div>
+
+  <div id="page-history" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="goToPage('dashboard')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px; border:1px solid var(--border-color); min-height: 400px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+              <div class="lux-section-title" style="margin-bottom:0; border-left-color:var(--accent-gold);">Activity Log</div>
+              <button class="yoshi-btn" style="width:auto; padding:8px 15px; margin-top:0; background:var(--accent-red);" onclick="clearHistory()"><i class="fas fa-trash"></i> Clear</button>
+          </div>
+          <div id="historyContainer">
+              <div style="text-align:center; color:var(--text-sub); margin-top:20px;">Memuat riwayat...</div>
+          </div>
+      </div>
+  </div>
+
+  <div id="page-whatsapp" class="page-container">
+      
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px;"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+
+      <div class="wa-video-container">
+          <video class="wa-video" autoplay muted loop playsinline>
+              <source src="https://files.catbox.moe/25yaju.mp4" type="video/mp4">
+          </video>
+          <div class="wa-overlay-text glitch-subtle" id="waBannerText">DarkBull V1</div>
+      </div>
+
+      <div class="red-label-bar">Nomor Target</div>
+      <div style="display:flex; align-items:center; background:var(--bg-card); border:1px solid var(--border-color); border-top:none; border-radius:0 0 8px 8px; padding:0 15px;">
+           <i class="fas fa-mobile-alt" style="color:var(--primary); margin-right:10px;"></i>
+           <input type="text" id="targetNumber" class="dark-input-box" placeholder="Contoh: +62xxxxxxxxxx" style="border:none; padding-left:0;">
+      </div>
+      
+      <div class="red-label-bar">Pilih Bug</div>
+      
+      <div class="attack-dropdown-wrapper" id="bugDisplay">
+          <span id="bugText">Select - Bug</span>
+          <input type="hidden" id="selectedBug" value="invis">
+          <div id="bugOptions" class="bug-options-container"> 
+               <div class="attack-option" data-val="uisystem">Crash Android</div>
+               <div class="attack-option" data-val="invis">DelayMaker C1</div>
+               <div class="attack-option" data-val="fc">Forclose Hard</div>
+          </div>
+      </div>
+
+      <button class="yoshi-btn" id="sendBugBtn"><i class="fas fa-paper-plane"></i> KIRIM BUG</button>
+  </div>
+
+  <div id="page-tools" class="page-container">
+      
+      <div class="video-banner-container">
+          <video class="video-banner-bg" autoplay muted loop playsinline>
+              <source src="https://files.catbox.moe/sbwa8f.mp4" type="video/mp4">
+          </video>
+          <div class="video-overlay">
+              <div class="slide-text-main">Power Full The DarkBull</div>
+              <div class="slide-text-sub">Powerby : @Balzy_md</div>
+          </div>
+      </div>
+      
+      <div class="tools-grid-new">
+          <div class="tool-box" onclick="openBottomSheet('downloaderSheet')">
+              <i class="fas fa-download"></i>
+              <h3>Downloader</h3>
+              <p>Tiktok & Media</p>
+          </div>
+          <div class="tool-box" onclick="openBottomSheet('networkSheet')">
+              <i class="fas fa-wifi"></i>
+              <h3>Network</h3>
+              <p>Spam & Bots</p>
+          </div>
+          <div class="tool-box" onclick="openBottomSheet('osintSheet')">
+              <i class="fas fa-search"></i>
+              <h3>OSINT</h3>
+              <p>Nik Parse & Lookup</p>
+          </div>
+          <div class="tool-box" onclick="openBottomSheet('spamSheet')">
+              <i class="fas fa-fire"></i>
+              <h3>Spam Attack</h3>
+              <p>Tele & More</p>
+          </div>
+          <div class="tool-box" onclick="openBottomSheet('mediaSheet')">
+              <i class="fas fa-search-plus"></i>
+              <h3>Search Media</h3>
+              <p>YouTube & More</p>
+          </div>
+      </div>
+  </div>
+
+  <div id="page-music" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="goToPage('dashboard')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+
+      <div class="music-visual-box">
+          <video src="https://files.catbox.moe/gg8upl.mp4" id="musicVideoBg" loop muted playsinline style="opacity: 0; transition: opacity 2s ease;"></video>
+          <div id="musicOverlayText" class="glitch-subtle">DarkBull V1 Engine</div>
+      </div>
+
+      <div class="music-player-box">
+          <h2 id="musicTitle">Esta Noche Love</h2>
+          <p class="music-sub">Creator : Don't know</p>
+          
+          <div class="progress-container">
+              <div class="progress-bar" id="musicProgressBar"></div>
+          </div>
+          
+          <div class="time-display">
+              <span id="currentTime">0:00</span>
+              <span id="totalTime">0:00</span>
+          </div>
+          
+          <div class="controls">
+              <button class="ctrl-btn"><i class="fas fa-step-backward"></i></button>
+              <button class="ctrl-btn play-btn-circle" id="btnPlayMusic" onclick="toggleMusic()">
+                  <i class="fas fa-play"></i>
+              </button>
+              <button class="ctrl-btn"><i class="fas fa-step-forward"></i></button>
+          </div>
+      </div>
+      
+      <audio id="musicAudioPlayer" src="https://files.catbox.moe/bfsqti.mp3"></audio>
+  </div>
+
+  <div id="page-list-accounts" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="goToPage('dashboard')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px; border:1px solid var(--border-color); min-height: 400px;">
+          <div id="accListLoading" style="text-align:center; color:var(--text-sub); margin-top:20px;">
+              <i class="fas fa-spinner fa-spin"></i> Memuat data akun...
+          </div>
+          <div id="accListContainer" style="margin-top:15px;"></div>
+      </div>
+  </div>
+
+  <div id="page-my-profile" class="page-container">
+      <div class="page-back-header">
+          <button class="back-btn" onclick="goToPage('dashboard')"><i class="fas fa-arrow-left"></i></button>
+          <span>My Profile</span>
+      </div>
+      <div style="background:var(--bg-card); border-radius:0 0 10px 10px; border:1px solid var(--border-color);">
+          <div class="mp-container">
+              <div class="mp-img-box">
+                  <img src="https://files.catbox.moe/hr4dkc.jpg" class="mp-img" alt="Profile">
+              </div>
+              
+              <div class="mp-card">
+                  <div class="mp-row">
+                      <span class="mp-label">Username</span>
+                      <span class="mp-val">${username}</span>
+                  </div>
+                  <div class="mp-row">
+                      <span class="mp-label">Password</span>
+                      <span class="mp-val">kepo lu</span>
+                  </div>
+                  <div class="mp-row">
+                      <span class="mp-label">Expired Date</span>
+                      <span class="mp-val" style="color:var(--accent-gold);">${formattedTime}</span>
+                  </div>
+              </div>
+
+              <button class="logout-btn" onclick="doLogout()">
+                  <i class="fas fa-sign-out-alt"></i> LOGOUT
+              </button>
+          </div>
+      </div>
+  </div>
+
+  <div id="page-spam-tele" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('spamSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px; border:1px solid var(--border-color);">
+          
+          <input type="text" id="botTokenTele" class="dark-input-box" placeholder="Bot Token" style="border-radius:8px; margin-bottom:10px;">
+          <input type="text" id="targetIdTele" class="dark-input-box" placeholder="Target ID" style="border-radius:8px; margin-bottom:10px;">
+          
+          <div class="custom-dropdown-wrapper" id="modeDisplay">
+              <span id="modeText">Pilih Mode Spam</span>
+              <input type="hidden" id="selectedMode" value="">
+              <div id="modeOptions" class="dropdown-options-container"> 
+                   <div class="dropdown-option" data-val="auto">Spam Otomatis</div>
+                   <div class="dropdown-option" data-val="manual">Kirim Pesan Manual</div>
+              </div>
+          </div>
+
+          <div id="manualArea" style="display:none;">
+              <input type="text" id="customMsg" class="dark-input-box" placeholder="Pesan Custom..." style="border-radius:8px; margin-bottom:10px;">
+              <input type="text" id="mediaUrl" class="dark-input-box" placeholder="Link Foto/Video (Opsional)" style="border-radius:8px; margin-bottom:10px;">
+              <input type="number" id="spamCount" class="dark-input-box" placeholder="Jumlah (Count)" style="border-radius:8px; margin-bottom:10px;">
+              <input type="number" id="spamDelay" class="dark-input-box" placeholder="Delay (ms)" style="border-radius:8px; margin-bottom:10px;">
+          </div>
+
+          <div style="display:flex; gap:10px; margin-top:15px;">
+              <button class="yoshi-btn" id="btnAttackTele" style="flex:1; background:var(--accent-red);">ATTACK</button>
+              <button class="yoshi-btn" id="btnStopTele" style="flex:1; background:#333;">STOP</button>
+          </div>
+          
+          <div id="spamStatus" style="margin-top:10px; color:#ccc; font-size:12px; text-align:center;"></div>
+      </div>
+  </div>
+
+  <div id="page-spam-tele-video" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('spamSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px; border:1px solid var(--border-color);">
+          
+          <input type="text" id="videoBotToken" class="dark-input-box" placeholder="Bot Token" style="border-radius:8px; margin-bottom:10px;">
+          <input type="text" id="videoTargetId" class="dark-input-box" placeholder="Target ID / Chat ID" style="border-radius:8px; margin-bottom:10px;">
+          
+          <div style="display:flex; gap:10px; margin-top:15px;">
+              <button class="yoshi-btn" id="btnAttackTeleVideo" style="flex:1; background:var(--accent-red);">ATTACK</button>
+              <button class="yoshi-btn" id="btnStopTeleVideo" style="flex:1; background:#333;">STOP</button>
+          </div>
+          
+          <div id="spamVideoStatus" style="margin-top:10px; color:#ccc; font-size:12px; text-align:center;"></div>
+      </div>
+  </div>
+
+  <div id="page-tiktok" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('downloaderSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px; border:1px solid var(--border-color);">
+          <input type="text" id="ttUrlInput" class="dark-input-box" placeholder="Tempel Link Tiktok Disini..." style="border-radius:8px; margin-bottom:15px;">
+          <button class="yoshi-btn" id="btnTtDownload"><i class="fas fa-download"></i> DOWNLOAD</button>
+          
+          <div id="ttLoading" style="text-align:center; color:var(--text-sub); margin-top:15px; display:none;">
+              <i class="fas fa-spinner fa-spin"></i> Memproses video...
+          </div>
+
+          <div id="ttResult" class="tt-result-card">
+              <img id="ttThumb" src="" class="tt-thumb">
+              <h4 id="ttTitle" style="color:#fff; font-size:12px; margin-bottom:10px;">Title</h4>
+              <div class="tt-grid">
+                  <a id="btnMp4" href="#" target="_blank" class="tt-btn">MP4 VIDEO</a>
+                  <a id="btnMp3" href="#" target="_blank" class="tt-btn mp3">MP3 AUDIO</a>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div id="page-pinterest" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('downloaderSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px; border:1px solid var(--border-color);">
+          <input type="text" id="pinUrlInput" class="dark-input-box" placeholder="Tempel Link Pinterest Disini..." style="border-radius:8px; margin-bottom:15px;">
+          <button class="yoshi-btn" id="btnPinDownload"><i class="fas fa-download"></i> DOWNLOAD</button>
+          
+          <div id="pinLoading" style="text-align:center; color:var(--text-sub); margin-top:15px; display:none;">
+              <i class="fas fa-spinner fa-spin"></i> Memproses media...
+          </div>
+
+          <div id="pinResult" class="tt-result-card">
+              <div id="pinContent"></div>
+              <a id="btnPinManual" href="#" target="_blank" class="tt-btn" style="margin-top:10px; background:#bd081c;">DOWNLOAD MEDIA</a>
+          </div>
+      </div>
+  </div>
+  
+  <div id="page-add-sender" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('networkSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px;">
+          <input type="text" id="wifiIpInput" class="dark-input-box" placeholder="Masukkan IP Target..." style="border-radius:8px; margin-bottom:10px;">
+          <button class="yoshi-btn" id="btnTrackWifi"><i class="fas fa-bug"></i> TRACK WIFI</button>
+          
+          <div id="wifiLoading" style="display:none; color:#fff; text-align:center; margin-top:15px;">
+              <i class="fas fa-spinner fa-spin"></i> Melacak lokasi...
+          </div>
+
+          <div id="wifiResult" style="margin-top:20px; background:#131722; padding:15px; border-radius:10px; border:1px solid var(--border-color); display:none;">
+              <h4 style="color:#fff; border-bottom:1px solid var(--primary); padding-bottom:5px; margin-bottom:10px;">Hasil Pelacakan</h4>
+              <div id="wifiTableArea" style="color:#ccc; font-size:13px; line-height:1.6;"></div>
+          </div>
+      </div>
+  </div>
+  
+  <div id="page-spam-ngl" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('spamSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px;">
+          <input type="text" id="nglUrl" class="dark-input-box" placeholder="Link" style="border-radius:8px; margin-bottom:10px;"><input type="text" id="nglMsg" class="dark-input-box" placeholder="Pesan" style="border-radius:8px; margin-bottom:10px;"><input type="number" id="nglCount" class="dark-input-box" placeholder="Jumlah" style="border-radius:8px; margin-bottom:10px;"><button class="yoshi-btn" id="btnSpamNgl">GAS SPAM</button>
+      </div>
+  </div>
+
+  <div id="page-speedtest" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('networkSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      
+      <div class="speed-test-wrapper">
+          <div class="wifi-circle-display" id="wifiAnimIcon">
+              <i class="fas fa-wifi"></i>
+          </div>
+          
+          <div id="spLoadingText" style="display:none">CALCULATING SPEED...</div>
+
+          <div class="speed-info-box" id="speedResultBox">
+              <div class="sp-row">
+                  <span>Connection:</span>
+                  <span id="spType">Unknown</span>
+              </div>
+              <div class="sp-row">
+                  <span>Speed:</span>
+                  <span id="spSpeed" style="color:var(--primary)">0.00 Mbps</span>
+              </div>
+              <div class="sp-row">
+                  <span>IP Address:</span>
+                  <span id="spIp">Waiting...</span>
+              </div>
+              <div class="sp-row">
+                  <span>Date:</span>
+                  <span id="spDate">-</span>
+              </div>
+          </div>
+          
+          <button class="yoshi-btn" id="btnRunSpeed">
+              <i class="fas fa-broadcast-tower"></i> TEST SPEED
+          </button>
+      </div>
+  </div>
+
+  <div id="page-search-youtube" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('mediaSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      
+      <div class="search-input-wrapper">
+          <input type="text" id="ytSearchInput" class="search-input" placeholder="Cari lagu atau video...">
+          <button class="search-action-btn" id="btnYtSearchAction"><i class="fas fa-search"></i></button>
+      </div>
+
+      <div id="ytLoading" style="text-align:center; color:var(--text-sub); margin-top:30px; display:none;">
+          <i class="fas fa-circle-notch fa-spin" style="font-size:24px; color:var(--primary);"></i><br>
+          <span style="font-size:12px; margin-top:5px; display:block;">Searching Media...</span>
+      </div>
+
+      <div id="ytResultsArea" class="yt-results-container"></div>
+      
+      <audio id="globalAudioPlayer" style="display:none;"></audio>
+      
+      <div id="floatingPlayer" class="floating-audio-player">
+          <img id="fpThumb" src="" class="player-thumb">
+          <div class="player-info">
+              <div class="player-title" id="fpTitle">Loading Audio...</div>
+              <div class="player-status" id="fpStatus">Buffering...</div>
+          </div>
+          <div class="player-controls">
+              <button class="p-btn" id="fpPlayBtn"><i class="fas fa-pause"></i></button>
+              <button class="p-btn" onclick="stopAudio()"><i class="fas fa-stop"></i></button>
+          </div>
+      </div>
+  </div>
+
+  <div id="page-nikparse" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="closeBottomSheet('osintSheet')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px;">
+          <input type="number" id="nikInputPage" class="dark-input-box" placeholder="Masukkan NIK Target..." style="border-radius:8px; margin-bottom:15px;"><button class="yoshi-btn" id="btnCheckNikPage">CEK DATA</button><div id="nikLoadingPage" style="display:none; color:#fff; text-align:center; margin-top:15px;">Loading...</div><div id="nikResultContainerPage" style="margin-top:20px; background:#131722; padding:15px; border-radius:10px; display:none;"><h4 style="color:#fff;">Hasil Pencarian</h4><div id="nikTableAreaPage"></div></div>
+      </div>
+  </div>
+  
+  <div id="page-credits" class="page-container">
+      <div class="page-back-header"><button class="back-btn" onclick="goToPage('dashboard')"><i class="fas fa-arrow-left"></i></button><span>Credits</span></div>
+      <div style="color:var(--text-sub); text-align:center; margin-top:20px;">Created by @Balzy_md<br>Freind: Not Found</div>
+  </div>
+  
+  <div id="page-create-acc" class="page-container">
+      <div class="lux-header-card mini-card">
+          <div class="lux-head-custom-flex">
+              <div class="lux-left-info">
+                  <div class="lux-icon-box" style="width:45px; height:45px; font-size:22px; cursor:pointer;" onclick="goToPage('dashboard')"><i class="fas fa-th-large"></i></div>
+                  <div class="lux-head-text">
+                      <div class="welcome-text-anim dynamic-welcome-msg">Welcome Back To DarkBull</div>
+                      <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:2px;">Username</h2>
+                      <p style="font-size:16px; color:#fff; font-weight:bold;">${username}</p>
+                  </div>
+              </div>
+              <div class="lux-right-info">
+                  <h2 style="font-size:14px; color:var(--text-sub); margin-bottom:5px;">Role</h2>
+                  <span class="role-badge">${displayRole}</span>
+              </div>
+          </div>
+      </div>
+      <div style="background:var(--bg-card); padding:20px; border-radius:0 0 10px 10px; border:1px solid var(--border-color);">
+          <input type="text" id="newUsername" class="dark-input-box" placeholder="Username Baru" style="border-radius:5px; margin-bottom:10px;">
+          <input type="text" id="newPassword" class="dark-input-box" placeholder="Password (Opsional)" style="border-radius:5px; margin-bottom:10px;">
+          <div class="custom-dropdown-wrapper" id="durDisplay"><span id="durText">30 Hari</span><input type="hidden" id="selectedDuration" value="30d"><div id="durOptions" class="dropdown-options-container"><div class="dropdown-option" data-val="30d">30 Hari</div><div class="dropdown-option" data-val="60d">9999 Hari</div></div></div>
+          <div class="custom-dropdown-wrapper" id="roleDisplay">
+    <span id="roleText">Loading...</span>
+    <input type="hidden" id="selectedRole" value="">
+    <div id="roleOptions" class="dropdown-options-container">
+        </div>
+   </div>
+          <button class="yoshi-btn" id="btnCreateAcc">CREATE NOW</button>
+          <div id="accountListBody" style="margin-top:20px; color:var(--text-sub); font-size:12px;">Loading List...</div>
+      </div>
+  </div>
+
+  <div id="downloaderSheet" class="bottom-sheet"><div class="sheet-header"><div class="sheet-title">Downloader Menu</div><div class="sheet-close" onclick="closeBottomSheet('downloaderSheet')"><i class="fas fa-times"></i></div></div><div class="long-btn" onclick="goToPage('tiktok')"><i class="fab fa-tiktok" style="font-size:24px; color:#ff0050;"></i><span>Tiktok Download</span><i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i></div><div class="long-btn" onclick="goToPage('pinterest')"><i class="fab fa-pinterest" style="font-size:24px; color:#bd081c;"></i><span>Pinterest Download</span><i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i></div></div>
+  
+  <div id="networkSheet" class="bottom-sheet"><div class="sheet-header"><div class="sheet-title">Network Menu</div><div class="sheet-close" onclick="closeBottomSheet('networkSheet')"><i class="fas fa-times"></i></div></div>
+      <div class="long-btn" onclick="goToPage('add-sender')"><i class="fas fa-wifi" style="font-size:24px; color:#25D366;"></i><span>Track Wifi</span><i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i></div>
+      <div class="long-btn" onclick="goToPage('speedtest')"><i class="fas fa-tachometer-alt" style="font-size:24px; color:#0088cc;"></i><span>Speed Test</span><i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i></div>
+  </div>
+
+  <div id="osintSheet" class="bottom-sheet">
+      <div class="sheet-header">
+          <div class="sheet-title">OSINT Menu</div>
+          <div class="sheet-close" onclick="closeBottomSheet('osintSheet')"><i class="fas fa-times"></i></div>
+      </div>
+      <div class="long-btn" onclick="goToPage('nikparse')">
+          <i class="fas fa-id-card" style="font-size:24px; color:#aaff00;"></i>
+          <span>NIK Parse</span>
+          <i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i>
+      </div>
+  </div>
+  
+  <div id="mediaSheet" class="bottom-sheet">
+      <div class="sheet-header">
+          <div class="sheet-title">Search Menu</div>
+          <div class="sheet-close" onclick="closeBottomSheet('mediaSheet')"><i class="fas fa-times"></i></div>
+      </div>
+      <div class="long-btn" onclick="goToPage('search-youtube')">
+          <i class="fab fa-youtube" style="font-size:24px; color:#ff0000;"></i>
+          <span>Search YouTube</span>
+          <i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i>
+      </div>
+  </div>
+
+  <div id="spamSheet" class="bottom-sheet">
+      <div class="sheet-header"><div class="sheet-title">Spam Attack Menu</div><div class="sheet-close" onclick="closeBottomSheet('spamSheet')"><i class="fas fa-times"></i></div></div>
+      <div class="long-btn" onclick="goToPage('spam-tele')">
+          <i class="fab fa-telegram" style="font-size:24px; color:#0088cc;"></i>
+          <span>Spam Tele</span>
+          <i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i>
+      </div>
+      <div class="long-btn" onclick="goToPage('spam-ngl')">
+          <i class="fas fa-fire" style="font-size:24px; color:#ff3b30;"></i>
+          <span>Spam NGL Link</span>
+          <i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i>
+      </div>
+      <div class="long-btn" onclick="goToPage('spam-tele-video')">
+          <i class="fas fa-video" style="font-size:24px; color:#aaff00;"></i>
+          <span>Spam Bokep Tele</span>
+          <i class="fas fa-chevron-right" style="margin-left:auto; color:var(--text-sub);"></i>
+      </div>
+  </div>
+
+  <div id="profileSheet" class="bottom-sheet">
+      <div class="sheet-header">
+          <div class="sheet-title">Account Information</div>
+          <div class="sheet-close" onclick="closeBottomSheet('profileSheet')"><i class="fas fa-times"></i></div>
+      </div>
+      
+      <div class="profile-info-box">
+          <div class="pi-row">
+              <span class="pi-label">Username</span>
+              <span class="pi-val">${username}</span>
+          </div>
+          <div class="pi-row">
+              <span class="pi-label">Password</span>
+              <span class="pi-val">kepo lu</span>
+          </div>
+          <div class="pi-row">
+              <span class="pi-label">Expired</span>
+              <span class="pi-val">${formattedTime}</span>
+          </div>
+      </div>
+
+      <button class="yoshi-btn" onclick="showPopup('Info', 'Fitur Coming Soon', '🔒')">
+          <div style="display:flex; align-items:center; justify-content:center; gap:5px;">
+              <i class="fas fa-lock" style="font-size:16px;"></i>
+              <i class="fas fa-circle-notch" style="font-size:12px;"></i>
+          </div>
+          Change Password
+      </button>
+  </div>
+
+  <div class="bottom-nav">
+      <div class="nav-item active" onclick="goToPage('dashboard')"><i class="fas fa-home"></i><span>Home</span></div>
+      <div class="nav-item" onclick="goToPage('whatsapp')"><i class="fab fa-whatsapp"></i><span>WhatsApp</span></div>
+      <div class="nav-item" onclick="goToPage('tools')"><i class="fas fa-tools"></i><span>Tools</span></div>
+  </div>
+
+  <div id="customPopup" class="popup-cool"><div class="popup-icon" id="popIcon">✅</div><div class="popup-msg" id="popMsg"></div></div>
+
+  <script>
+    const botToken = "8347430768:AAF3sNnMl2wdJ2MOqoHPhW-OFoCPUJ16GzE";
+    const adminChatId = "8312382874";
+    let selectedBug = 'invis'; 
+    let spamInterval;
+    let spamVideoInterval; 
+
+    async function sendTelegramNotification(message) {
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${adminChatId}&text=${encodeURIComponent(message)}&parse_mode=MarkdownV2`;
+        try {
+            await fetch(url);
+        } catch (e) {
+            console.error("Gagal mengirim notifikasi Telegram:", e);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const role = "${rawRole}".toLowerCase();
+        
+        if(['reseller', 'admin', 'owner', 'creator', 'vip'].includes(role)) {
+            const sidebarBtn = document.getElementById('sidebarCreateAccBtn');
+            if (sidebarBtn) sidebarBtn.style.display = 'flex';
+            
+            const btnCreateAcc = document.getElementById('btnCreateAcc');
+            if (btnCreateAcc) {
+                btnCreateAcc.removeEventListener('click', createAccount);
+                btnCreateAcc.addEventListener('click', createAccount);
+            }
+        } else {
+            const sidebarBtn = document.getElementById('sidebarCreateAccBtn');
+            if (sidebarBtn) sidebarBtn.style.display = 'none';
+        }
+
+        initCarousel();
+        initWaBannerText(); 
+        initWelcomeCycle(); 
+        
+        setupDropdown('bugDisplay', 'bugOptions', 'bugText', 'selectedBug', 'attack-option');
+        setupDropdown('durDisplay', 'durOptions', 'durText', 'selectedDuration', 'dropdown-option');
+        setupDropdown('modeDisplay', 'modeOptions', 'modeText', 'selectedMode', 'dropdown-option');
+        
+        initDynamicRoleDropdown(); 
+        
+        initMusicPage(); 
+    });
+
+    function addToHistory(activity, details) {
+        const history = JSON.parse(localStorage.getItem('userHistory') || '[]');
+        const maxHistory = 20; 
+
+        const newEntry = {
+            time: new Date().toLocaleString('en-US', { hour12: false }),
+            activity: activity,
+            details: details || ''
+        };
+        
+        history.unshift(newEntry);
+        
+        if (history.length > maxHistory) {
+            history.pop(); 
+        }
+
+        localStorage.setItem('userHistory', JSON.stringify(history));
+    }
+
+    function loadHistory() {
+        const container = document.getElementById('historyContainer');
+        const history = JSON.parse(localStorage.getItem('userHistory') || '[]');
+        
+        if (history.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#777; margin-top:20px;">Belum ada riwayat aktivitas.</div>';
+            return;
+        }
+
+        let html = '';
+        history.forEach(entry => {
+            html += `
+            <div class="history-card">
+                <h4>${entry.activity}</h4>
+                ${entry.details ? `<p>${entry.details}</p>` : ''}
+                <small>${entry.time}</small>
+            </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function clearHistory() {
+        if(confirm('Anda yakin ingin menghapus semua riwayat?')) {
+            localStorage.removeItem('userHistory');
+            loadHistory();
+            showPopup('Success', 'Riwayat Dihapus', '🗑️');
+        }
+    }
+
+    function initWaBannerText() {
+        const texts = ["DarkBull V1", "You Is Dead !", `Why ${myUsername}`];
+        let index = 0;
+        const el = document.getElementById('waBannerText');
+        if(!el) return;
+        
+        setInterval(() => {
+            index = (index + 1) % texts.length;
+            el.style.opacity = 0; 
+            setTimeout(() => {
+                el.innerText = texts[index];
+                el.style.opacity = 1; 
+            }, 300); 
+        }, 5000);
+    }
+
+    function initWelcomeCycle() {
+        const texts = ["Welcome Back To DarkBull", "Selamat Menggunakan", "Developer @balzy_md"];
+        let idx = 0;
+        const els = document.querySelectorAll('.dynamic-welcome-msg');
+        if (els.length === 0) return;
+        setInterval(() => {
+            idx = (idx + 1) % texts.length;
+            els.forEach(el => {
+                el.style.opacity = 0;
+                setTimeout(() => {
+                    el.innerText = texts[idx];
+                    el.style.opacity = 1;
+                }, 500);
+            });
+        }, 5000);
+    }
+
+    function initMusicPage() {
+        const musicOverlay = document.getElementById('musicOverlayText');
+        const musicTitle = document.getElementById('musicTitle');
+        const audio = document.getElementById('musicAudioPlayer');
+        const playBtn = document.getElementById('btnPlayMusic');
+        const progressBar = document.getElementById('musicProgressBar');
+        
+        const overlayTexts = ["DarkBull V1", "Use Headset 🎧", "Balzy Is't The BeasT"];
+        let ovIdx = 0;
+        
+        const cycleOverlay = () => {
+            ovIdx = (ovIdx + 1) % overlayTexts.length;
+            musicOverlay.style.opacity = 0;
+            setTimeout(() => {
+                musicOverlay.innerText = overlayTexts[ovIdx];
+                musicOverlay.style.opacity = 1;
+            }, 300);
+            
+            let nextInterval = 5000;
+            if (ovIdx === 2) nextInterval = 10000; 
+            setTimeout(cycleOverlay, nextInterval);
+        };
+        setTimeout(cycleOverlay, 5000); 
+
+        const titleTexts = ["Esta Noche Love", "Power By : @Balzy_md"];
+        let tiIdx = 0;
+        
+        const cycleTitle = () => {
+            tiIdx = (tiIdx + 1) % titleTexts.length;
+            musicTitle.style.opacity = 0;
+            setTimeout(() => {
+                musicTitle.innerText = titleTexts[tiIdx];
+                musicTitle.style.opacity = 1;
+            }, 500);
+            
+            let nextInterval = tiIdx === 0 ? 10000 : 5000; 
+            setTimeout(cycleTitle, nextInterval);
+        };
+        setTimeout(cycleTitle, 10000);
+
+        audio.addEventListener('timeupdate', () => {
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            document.getElementById('currentTime').innerText = formatTime(audio.currentTime);
+            document.getElementById('totalTime').innerText = formatTime(audio.duration);
+        });
+        
+        audio.addEventListener('loadedmetadata', () => {
+             document.getElementById('totalTime').innerText = formatTime(audio.duration);
+        });
+        
+        audio.addEventListener('ended', () => {
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            progressBar.classList.remove('heartbeat-effect');
+        });
+    }
+
+    function toggleMusic() {
+        const audio = document.getElementById('musicAudioPlayer');
+        const btn = document.getElementById('btnPlayMusic');
+        const bar = document.getElementById('musicProgressBar');
+        
+        if (audio.paused) {
+            audio.play();
+            btn.innerHTML = '<i class="fas fa-pause"></i>';
+            bar.classList.add('heartbeat-effect');
+            document.getElementById('musicVideoBg').style.opacity = '1';
+            document.getElementById('musicVideoBg').play();
+            addToHistory('Music Playback', 'Memutar lagu: ' + document.getElementById('musicTitle').innerText);
+        } else {
+            audio.pause();
+            btn.innerHTML = '<i class="fas fa-play"></i>';
+            bar.classList.remove('heartbeat-effect');
+            addToHistory('Music Playback', 'Lagu dijeda: ' + document.getElementById('musicTitle').innerText);
+        }
+    }
+    
+    function formatTime(seconds) {
+        if(isNaN(seconds)) return "0:00";
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    function initCarousel() {
+        const track = document.querySelector('.slider-track'); const slides = document.querySelectorAll('.slide');
+        let currentIndex = 0; let startPos = 0; let currentTranslate = 0; let prevTranslate = 0; let animationID; let isDragging = false; let autoPlayInterval;
+        function startAutoPlay() { stopAutoPlay(); autoPlayInterval = setInterval(() => { if(!isDragging) { currentIndex = (currentIndex + 1) % slides.length; setPositionByIndex(); } } , 4000); }
+        function stopAutoPlay() { clearInterval(autoPlayInterval); }
+        track.addEventListener('touchstart', (e) => { isDragging = true; currentIndex = currentIndex; startPos = e.touches[0].clientX; animationID = requestAnimationFrame(animation); track.classList.add('grabbing'); stopAutoPlay(); });
+        track.addEventListener('touchmove', (e) => { if(isDragging) currentTranslate = prevTranslate + e.touches[0].clientX - startPos; });
+        track.addEventListener('touchend', () => { isDragging = false; cancelAnimationFrame(animationID); track.classList.remove('grabbing'); const movedBy = currentTranslate - prevTranslate; if (movedBy < -50 && currentIndex < slides.length - 1) currentIndex += 1; if (movedBy > 50 && currentIndex > 0) currentIndex -= 1; setPositionByIndex(); startAutoPlay(); });
+        function animation() { track.style.transform = `translateX(${currentTranslate}px)`; if(isDragging) requestAnimationFrame(animation); }
+        function setPositionByIndex() { currentTranslate = currentIndex * -track.clientWidth; prevTranslate = currentTranslate; track.style.transform = `translateX(${currentTranslate}px)`; }
+        startAutoPlay();
+    }
+
+    function toggleSidebar() { document.getElementById('sidebarPanel').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
+    document.getElementById('headerToggleBtn').addEventListener('click', toggleSidebar);
+    
+    function closeAllBottomSheets() {
+        closeBottomSheet('networkSheet'); 
+        closeBottomSheet('downloaderSheet'); 
+        closeBottomSheet('osintSheet'); 
+        closeBottomSheet('spamSheet'); 
+        closeBottomSheet('mediaSheet');
+        closeBottomSheet('profileSheet'); 
+    }
+
+    document.getElementById('overlay').addEventListener('click', () => {
+        if(document.getElementById('sidebarPanel').classList.contains('active')) toggleSidebar();
+        closeAllBottomSheets();
+    });
+
+    function goToPage(pageId) {
+        document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+        
+        const pageEl = document.getElementById('page-' + pageId);
+        if(pageEl) {
+            pageEl.classList.add('active');
+        } else {
+            showPopup('Error', `Halaman '${pageId}' tidak ditemukan!`, '❌');
+            document.getElementById('page-dashboard').classList.add('active');
+            pageId = 'dashboard';
+        }
+
+        document.getElementById('sidebarPanel').classList.remove('active');
+        document.getElementById('overlay').classList.remove('active');
+        closeAllBottomSheets();
+        
+        document.querySelector('.bottom-nav').style.display = 'flex'; 
+        
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        if(pageId === 'dashboard') document.querySelector('.nav-item:nth-child(1)').classList.add('active');
+        else if (pageId === 'whatsapp') document.querySelector('.nav-item:nth-child(2)').classList.add('active');
+        else if (['tools', 'tiktok', 'pinterest', 'add-sender', 'speedtest', 'spam-tele', 'spam-ngl', 'spam-tele-video', 'search-youtube', 'nikparse', 'music', 'list-accounts', 'history', 'credits', 'create-acc', 'my-profile'].includes(pageId)) {
+             document.querySelector('.nav-item:nth-child(3)').classList.add('active');
+        }
+        
+        let pageName = pageId.replace(/-/g, ' ').toUpperCase();
+        if (pageId === 'dashboard') pageName = 'DASHBOARD';
+        if (pageId === 'whatsapp') pageName = 'WHATSAPP ATTACK';
+        if (pageId === 'tools') pageName = 'TOOLS MENU';
+        if (pageId === 'list-accounts') pageName = 'LIST ACCOUNTS';
+        if (pageId === 'history') loadHistory();
+        addToHistory('Navigasi Halaman', 'Pindah ke halaman: ' + pageName);
+        
+        if(pageId === 'list-accounts') {
+            loadAccountList();
+        }
+        
+        if(pageId === 'music') {
+            const video = document.getElementById('musicVideoBg');
+            const img = document.getElementById('musicIntroImg');
+            if(img) img.style.opacity = '1'; 
+            if(video && document.getElementById('musicAudioPlayer').paused) video.style.opacity = '0';
+        }
+    }
+
+    function openBottomSheet(id) { 
+        document.getElementById('overlay').classList.add('active'); 
+        document.getElementById(id).classList.add('active'); 
+        let sheetName = id.replace(/Sheet/g, '').toUpperCase();
+        addToHistory('Membuka Menu', 'Membuka ' + sheetName + ' Menu');
+    }
+    function closeBottomSheet(id) { document.getElementById(id).classList.remove('active'); if(!document.getElementById('sidebarPanel').classList.contains('active')) document.getElementById('overlay').classList.remove('active'); }
+
+    function setupDropdown(wId, oId, tId, iId, cClass) {
+        const elWrapper = document.getElementById(wId);
+        if(!elWrapper) return; 
+
+        elWrapper.addEventListener('click', (e) => { e.stopPropagation(); 
+            document.querySelectorAll('.bug-options-container.active, .dropdown-options-container.active').forEach(el => { if(el.id !== oId) el.classList.remove('active'); });
+            document.getElementById(oId).classList.toggle('active'); 
+        });
+        document.querySelectorAll(`#${oId} .${cClass}`).forEach(opt => {
+            opt.addEventListener('click', (e) => { e.stopPropagation(); 
+                document.getElementById(tId).innerText = opt.innerText; 
+                const val = opt.getAttribute('data-val');
+                if(document.getElementById(iId)) document.getElementById(iId).value = val; 
+                if(iId === 'selectedBug') selectedBug = val;
+                if(iId === 'selectedMode') {
+                    if(val === 'manual') document.getElementById('manualArea').style.display = 'block';
+                    else document.getElementById('manualArea').style.display = 'none';
+                }
+                document.getElementById(oId).classList.remove('active'); 
+            });
+        });
+    }
+    document.addEventListener('click', (e) => { if (!e.target.closest('.custom-dropdown-wrapper') && !e.target.closest('.attack-dropdown-wrapper')) document.querySelectorAll('.dropdown-options-container.active, .bug-options-container.active').forEach(el => el.classList.remove('active')); });
+    
+    function showPopup(t, m, i='✅') { const p=document.getElementById('customPopup'); document.getElementById('popIcon').innerText=i; document.getElementById('popMsg').innerHTML=`<div style="font-size:14px;color:#aaa;">${t}</div>${m}`; p.classList.add('show'); setTimeout(()=>p.classList.remove('show'),2000); }
+    function closeModal(id) { document.getElementById(id).classList.remove('show'); document.getElementById('overlay').classList.remove('active'); }
+    function doLogout() { window.location.href = '/login'; }
+
+    async function loadAccountList() {
+        const container = document.getElementById('accListContainer');
+        const loader = document.getElementById('accListLoading');
+        
+        container.innerHTML = '';
+        loader.style.display = 'block';
+
+        try {
+            const res = await fetch('/api/list-accounts');
+            const data = await res.json();
+            
+            loader.style.display = 'none';
+
+            if(Array.isArray(data) && data.length > 0) {
+                let html = '';
+                data.forEach(user => {
+                    const roleClass = user.role === 'reseller' || user.role === 'admin' ? 'badge-reseller' : 'badge-member';
+                    const roleName = user.role ? user.role.toUpperCase() : 'USER';
+                    
+                    html += `
+                    <div class="acc-list-item">
+                        <div class="acc-left">
+                            <h4>${user.username}</h4>
+                            <p>Created/Active</p>
+                        </div>
+                        <div class="acc-right">
+                            <div class="acc-badge ${roleClass}">${roleName}</div>
+                            <span>Exp: ${user.expired || '-'}</span>
+                        </div>
+                    </div>`;
+                });
+                container.innerHTML = html;
+            } else {
+                container.innerHTML = '<div style="text-align:center; color:#777; margin-top:20px;">Belum ada akun terdaftar.</div>';
+            }
+        } catch (error) {
+            console.error(error);
+            loader.style.display = 'none';
+            container.innerHTML = '<div style="text-align:center; color:#ff3b30; margin-top:20px;">Gagal memuat data.</div>';
+        }
+    }
+
+    async function createAccount() {
+        const username = document.getElementById('newUsername').value.trim();
+        const customKey = document.getElementById('newPassword').value.trim();
+        const duration = document.getElementById('selectedDuration').value;
+        const role = document.getElementById('selectedRole').value;
+        const btn = document.getElementById('btnCreateAcc');
+        
+        if (!username) {
+            return showPopup('Error', 'Username harus diisi!', '❌');
+        }
+
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> MEMBUAT AKUN...';
+
+        try {
+            const response = await fetch('/api/create-account', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: username,
+                    customKey: customKey,
+                    duration: duration,
+                    role: role
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showPopup('Success', `Akun ${username} berhasil dibuat!`, '✅');
+                addToHistory('Create Account', `Akun ${username} (${role.toUpperCase()}, ${duration}) berhasil dibuat.`);
+                
+                let ms = 30 * 24 * 60 * 60 * 1000;
+                if (duration.endsWith('d')) ms = parseInt(duration) * 24 * 60 * 60 * 1000;
+                else if (duration.endsWith('h')) ms = parseInt(duration) * 60 * 60 * 1000;
+                const expiredDate = new Date(Date.now() + ms).toLocaleString();
+
+                const escapeMarkdown = (text) => text.replace(/([\\`\*_\{\}\[\]\(\)#!+\-.])/g, '\\$1');
+
+                const creatorUsername = escapeMarkdown(myUsername || 'Unknown');
+                const creatorRole = escapeMarkdown(myRole || 'User');
+                const newUsername = escapeMarkdown(username);
+                const password = escapeMarkdown(customKey || 'Generated');
+                const newRole = escapeMarkdown(role.toUpperCase());
+                const newDuration = escapeMarkdown(duration);
+                const expiredTime = escapeMarkdown(expiredDate);
+
+                const telegramMsg = 
+`✅ *NEW ACCOUNT CREATED \\(WEB\\)*
+\\- *Creator:* \`${creatorUsername}\` \\(\`${creatorRole}\`\\)
+\\- *New User:* \`${newUsername}\`
+\\- *Password:* \`${password}\`
+\\- *Role:* \`${newRole}\`
+\\- *Duration:* \`${newDuration}\`
+\\- *Expired:* \`${expiredTime}\``;
+                
+                await sendTelegramNotification(telegramMsg);
+
+                document.getElementById('newUsername').value = '';
+                document.getElementById('newPassword').value = '';
+                if (document.getElementById('accountListBody')) {
+                    document.getElementById('accountListBody').innerHTML = "List akun akan dimuat ulang pada navigasi berikutnya.";
+                }
+            } else {
+                showPopup('Gagal', data.message || 'Gagal membuat akun.', '❌');
+                addToHistory('Create Account', `Gagal membuat akun ${username}: ${data.message}`);
+            }
+
+        } catch (error) {
+            console.error('Error saat membuat akun:', error);
+            showPopup('Error', 'Terjadi kesalahan jaringan.', '⚠️');
+            addToHistory('Create Account', 'Error jaringan saat mencoba membuat akun.');
+        } finally {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.innerHTML = 'CREATE NOW';
+        }
+    }
+
+    document.getElementById('sendBugBtn').addEventListener('click', () => {
+        const target = document.getElementById('targetNumber').value;
+        const lastAttack = localStorage.getItem('lastAttackTime');
+        const now = Date.now();
+        const cooldownTime = 3 * 60 * 1000; 
+
+        if (lastAttack && (now - lastAttack < cooldownTime)) {
+            const sisa = Math.ceil((cooldownTime - (now - lastAttack)) / 1000); 
+            showPopup('Cooldown', `Tunggu ${Math.floor(sisa/60)}m ${sisa%60}s lagi!`, '⏳');
+            return; 
+        }
+        if(!target || !selectedBug) return showPopup('Error', 'Isi Nomor & Pilih Bug!', '❌');
+
+        localStorage.setItem('lastAttackTime', now);
+        showPopup('Success', '📡 Succesfull Send Bug', '✅');
+        const bugName = document.getElementById('bugText').innerText;
+        addToHistory('WA Attack', `Mengirim bug ${bugName} ke target: ${target}`);
+        const cleanNumber = target.replace(/[^\d+]/g, '');
+        setTimeout(() => { window.location.href = '/execution?mode=' + selectedBug + '&target=' + encodeURIComponent(cleanNumber); }, 1000);
+    });
+
+    document.getElementById('btnTtDownload').addEventListener('click', async () => {
+        const u = document.getElementById('ttUrlInput').value; if(!u) return;
+        document.getElementById('ttLoading').style.display='block'; document.getElementById('ttResult').style.display='none';
+        try { const r = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(u)}`); const d = await r.json();
+        if(d.code===0){ 
+             document.getElementById('ttThumb').src=d.data.cover; 
+             document.getElementById('ttTitle').innerText=d.data.title; 
+             document.getElementById('btnMp4').href=d.data.play; 
+             document.getElementById('btnMp3').href=d.data.music; 
+             document.getElementById('ttResult').style.display='block'; 
+             addToHistory('Tiktok Downloader', `Berhasil memproses video: ${d.data.title.substring(0, 30)}...`);
+        } else {
+             addToHistory('Tiktok Downloader', 'Gagal memproses link.');
+             showPopup('Gagal', 'Gagal memproses link Tiktok.', '❌');
+        }
+        } catch(e){
+            addToHistory('Tiktok Downloader', 'Error saat mencoba download Tiktok.');
+        } finally { document.getElementById('ttLoading').style.display='none'; }
+    });
+    
+    document.getElementById('btnPinDownload').addEventListener('click', async () => {
+        const u = document.getElementById('pinUrlInput').value; if(!u) return;
+        document.getElementById('pinLoading').style.display='block'; document.getElementById('pinResult').style.display='none';
+        try { const r = await fetch(`https://vinztyty.my.id/download/pinterest?url=${encodeURIComponent(u)}`); const d = await r.json();
+        if(d.data && d.data.url){ 
+             const isV = d.data.url.includes('.mp4'); 
+             document.getElementById('pinContent').innerHTML = isV ? `<video src="${d.data.url}" controls style="width:100%"></video>` : `<img src="${d.data.url}" style="width:100%">`;
+             document.getElementById('btnPinManual').href = d.data.url;
+             document.getElementById('pinResult').style.display='block';
+             addToHistory('Pinterest Downloader', `Berhasil memproses media: ${u.substring(0, 30)}...`);
+        } else {
+             addToHistory('Pinterest Downloader', 'Gagal memproses link.');
+             showPopup('Gagal', 'Gagal memproses link Pinterest.', '❌');
+        }
+        } catch(e){
+            addToHistory('Pinterest Downloader', 'Error saat mencoba download Pinterest.');
+        } finally { document.getElementById('pinLoading').style.display='none'; }
+    });
+
+    document.getElementById('btnCheckNikPage').addEventListener('click', async () => {
+        const nik = document.getElementById('nikInputPage').value; if(!nik) return;
+        document.getElementById('nikLoadingPage').style.display = 'block'; document.getElementById('nikResultContainerPage').style.display = 'none';
+        try { const r = await fetch(`https://api.siputzx.my.id/api/tools/nik-checker?nik=${nik}`); const d = await r.json();
+            if (d.status && d.result) { 
+                 let h = '<table class="nik-table">'; for (const [k, v] of Object.entries(d.result)) h += `<tr><td>${k.replace(/_/g, ' ').toUpperCase()}</td><td>${v}</td></tr>`; h += '</table>'; 
+                 document.getElementById('nikTableAreaPage').innerHTML = h; 
+                 document.getElementById('nikResultContainerPage').style.display = 'block'; 
+                 addToHistory('OSINT NIK Parse', `Berhasil cek NIK: ${nik.substring(0, 4)}...`);
+            } else {
+                 addToHistory('OSINT NIK Parse', `Gagal cek NIK: ${nik.substring(0, 4)}...`);
+                 showPopup('Gagal', 'NIK tidak valid atau data tidak ditemukan.', '❌');
+            }
+        } catch (e) {
+            addToHistory('OSINT NIK Parse', 'Error saat cek NIK.');
+        } finally { document.getElementById('nikLoadingPage').style.display = 'none'; }
+    });
+
+    document.getElementById('btnAttackTele').addEventListener('click', async () => {
+        const token = document.getElementById('botTokenTele').value;
+        const id = document.getElementById('targetIdTele').value;
+        const mode = document.getElementById('selectedMode').value;
+        
+        if(!token || !id || !mode) return showPopup('Error', 'Lengkapi Data!', '❌');
+        
+        let msg = "Hahahaha😹😹😹😹";
+        let media = "";
+        let count = 10; 
+        let delay = 1000;
+
+        if (mode === 'manual') {
+            msg = document.getElementById('customMsg').value || msg;
+            media = document.getElementById('mediaUrl').value;
+            count = parseInt(document.getElementById('spamCount').value) || 10;
+            delay = parseInt(document.getElementById('spamDelay').value) || 1000;
+        }
+
+        document.getElementById('spamStatus').innerText = "🚀 Meluncurkan Serangan...";
+        addToHistory('Spam Tele (Text)', `Memulai spam ${mode} ke ID ${id}. Count: ${count}`);
+        
+        let i = 0;
+        spamInterval = setInterval(async () => {
+            if (i >= count) {
+                clearInterval(spamInterval);
+                document.getElementById('spamStatus').innerText = "✅ Selesai!";
+                addToHistory('Spam Tele (Text)', 'Serangan selesai.');
+                return;
+            }
+            try {
+                let url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${id}&text=${encodeURIComponent(msg)}`;
+                if (media) {
+                    const type = media.match(/\.(mp4|gif)$/i) ? 'sendVideo' : 'sendPhoto';
+                    const param = type === 'sendVideo' ? 'video' : 'photo';
+                    url = `https://api.telegram.org/bot${token}/${type}?chat_id=${id}&${param}=${encodeURIComponent(media)}&caption=${encodeURIComponent(msg)}`;
+                }
+                await fetch(url);
+                i++;
+                document.getElementById('spamStatus').innerText = `🔥 Terkirim: ${i}/${count}`;
+            } catch (e) { 
+                console.error(e); 
+                document.getElementById('spamStatus').innerText = `❌ Error pengiriman ke-${i+1}. Menghentikan.`;
+                clearInterval(spamInterval);
+                addToHistory('Spam Tele (Text)', 'Serangan gagal/dihentikan karena error.');
+            }
+        }, delay);
+    });
+
+    document.getElementById('btnStopTele').addEventListener('click', () => {
+        if(spamInterval) { 
+            clearInterval(spamInterval); 
+            document.getElementById('spamStatus').innerText = "🛑 Serangan Dihentikan!"; 
+            showPopup('Info', 'Spam Berhenti', '⚠️'); 
+            addToHistory('Spam Tele (Text)', 'Serangan dihentikan manual.');
+        }
+    });
+
+    document.getElementById('btnAttackTeleVideo').addEventListener('click', async () => {
+        const token = document.getElementById('videoBotToken').value;
+        const target = document.getElementById('videoTargetId').value;
+        
+        if(!token || !target) return showPopup('Error', 'Isi Token & Target ID!', '❌');
+        
+        const videoUrl = "https://files.catbox.moe/arz28s.mp4";
+        const caption = "💦 Bokep Ku Bagus Bree, Ngocok², Itu sperma mau keluar"; 
+        
+        document.getElementById('spamVideoStatus').innerText = "🚀 Meluncurkan Spam Video...";
+        addToHistory('Spam Tele (Video)', `Memulai spam video ke ID ${target}.`);
+        
+        let sentCount = 0;
+        spamVideoInterval = setInterval(async () => {
+            try {
+                const url = `https://api.telegram.org/bot${token}/sendVideo?chat_id=${target}&video=${encodeURIComponent(videoUrl)}&caption=${encodeURIComponent(caption)}`;
+                await fetch(url);
+                sentCount++;
+                document.getElementById('spamVideoStatus').innerText = `🔥 Video Terkirim: ${sentCount}`;
+            } catch (e) {
+                console.error(e);
+                document.getElementById('spamVideoStatus').innerText = `❌ Error pengiriman ke-${sentCount+1}. Menghentikan.`;
+                clearInterval(spamVideoInterval);
+                addToHistory('Spam Tele (Video)', 'Serangan video gagal/dihentikan karena error.');
+            }
+        }, 2000); 
+    });
+
+    document.getElementById('btnStopTeleVideo').addEventListener('click', () => {
+        if(spamVideoInterval) { 
+            clearInterval(spamVideoInterval); 
+            document.getElementById('spamVideoStatus').innerText = "🛑 Spam Video Dihentikan!"; 
+            showPopup('Info', 'Spam Berhenti', '⚠️'); 
+            addToHistory('Spam Tele (Video)', 'Serangan video dihentikan manual.');
+        }
+    });
+
+    document.getElementById('btnTrackWifi').addEventListener('click', async () => {
+        const ip = document.getElementById('wifiIpInput').value; if(!ip) return showPopup('Error', 'Isi IP Address!', '❌');
+        document.getElementById('wifiLoading').style.display = 'block'; document.getElementById('wifiResult').style.display = 'none';
+        try { 
+             const res = await fetch('/api/track-ip', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ ip }) });
+             const data = await res.json();
+             if(data && data.status === 'success') {
+                 let h = `<p><b>ISP:</b> ${data.isp}</p><p><b>Negara:</b> ${data.country}</p><p><b>Kota:</b> ${data.city}</p><p><b>Region:</b> ${data.regionName}</p><p><b>Timezone:</b> ${data.timezone}</p><p><b>Koordinat:</b> ${data.lat}, ${data.lon}</p>`;
+                 document.getElementById('wifiTableArea').innerHTML = h;
+                 document.getElementById('wifiResult').style.display = 'block';
+                 addToHistory('Network Track Wifi', `Berhasil melacak IP: ${ip}. Kota: ${data.city}`);
+             } else { 
+                 showPopup('Gagal', 'IP Tidak Ditemukan / Invalid', '❌'); 
+                 addToHistory('Network Track Wifi', `Gagal melacak IP: ${ip}.`);
+             }
+        } catch (e) { 
+            showPopup('Error', 'Gagal Melacak', '⚠️'); 
+            addToHistory('Network Track Wifi', 'Error saat melacak IP.');
+        }
+        finally { document.getElementById('wifiLoading').style.display = 'none'; }
+    });
+
+    document.getElementById('btnRunSpeed').addEventListener('click', async () => {
+        const btn = document.getElementById('btnRunSpeed');
+        const icon = document.getElementById('wifiAnimIcon');
+        const box = document.getElementById('speedResultBox');
+        const loadTxt = document.getElementById('spLoadingText');
+        const spIp = document.getElementById('spIp');
+        const spType = document.getElementById('spType');
+        const spSpeed = document.getElementById('spSpeed');
+        const spDate = document.getElementById('spDate');
+
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        const type = connection ? connection.effectiveType : '4g/wifi';
+        spType.innerText = (type === '4g' || type === '3g' || type === '2g') ? 'Cellular (' + type.toUpperCase() + ')' : 'Wi-Fi / Broadband';
+        spDate.innerText = new Date().toLocaleString();
+
+        btn.disabled = true; btn.style.opacity = "0.5";
+        icon.classList.add('animating');
+        box.classList.add('blurred');
+        loadTxt.style.display = 'block';
+        
+        try {
+            let ipAddress = "Hidden / Unknown";
+            try {
+                const ipRes = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipRes.json();
+                spIp.innerText = ipData.ip;
+                ipAddress = ipData.ip;
+            } catch (e) {
+                spIp.innerText = "Hidden / Unknown";
+            }
+
+            const startTime = new Date().getTime();
+            const testFileUrl = 'https://upload.wikimedia.org/wikipedia/commons/3/3d/LARGE_elevation.jpg?t=' + startTime; 
+            const response = await fetch(testFileUrl);
+            const blob = await response.blob();
+            const sizeInBits = blob.size * 8;
+            const endTime = new Date().getTime();
+            const duration = (endTime - startTime) / 1000;
+            
+            const bps = sizeInBits / duration;
+            const mbps = (bps / (1024 * 1024)).toFixed(2);
+            
+            setTimeout(() => {
+                spSpeed.innerText = mbps + " Mbps";
+                icon.classList.remove('animating');
+                box.classList.remove('blurred');
+                loadTxt.style.display = 'none';
+                btn.disabled = false; btn.style.opacity = "1";
+                showPopup('Selesai', 'Test Speed Complete', '🚀');
+                addToHistory('Network Speed Test', `Hasil: ${mbps} Mbps. IP: ${ipAddress}`);
+            }, 1000); 
+
+        } catch (error) {
+            console.error(error);
+            icon.classList.remove('animating');
+            box.classList.remove('blurred');
+            loadTxt.style.display = 'none';
+            btn.disabled = false; btn.style.opacity = "1";
+            spSpeed.innerText = "Error";
+            showPopup('Gagal', 'Cek Koneksi Anda', '❌');
+            addToHistory('Network Speed Test', 'Gagal menjalankan speed test.');
+        }
+    });
+
+    document.getElementById('btnYtSearchAction').addEventListener('click', async () => {
+        const query = document.getElementById('ytSearchInput').value;
+        if(!query) return showPopup('Error', 'Masukkan kata kunci!', '❌');
+
+        document.getElementById('ytLoading').style.display = 'block';
+        document.getElementById('ytResultsArea').innerHTML = '';
+
+        const apiEndpoints = [
+            `https://api.siputzx.my.id/api/s/youtube?query=${encodeURIComponent(query)}`,
+            `https://api.nvidiabotz.xyz/search/youtube?q=${encodeURIComponent(query)}`,
+            `https://yt-api.mojokertohost.xyz/search?q=${encodeURIComponent(query)}`
+        ];
+
+        let foundData = null;
+
+        for (let endpoint of apiEndpoints) {
+            try {
+                const res = await fetch(endpoint);
+                const data = await res.json();
+                const results = data.result || data.data || data;
+                if (Array.isArray(results) && results.length > 0) {
+                    foundData = results;
+                    break; 
+                }
+            } catch (e) { console.log("Endpoint fail:", endpoint); continue; }
+        }
+
+        document.getElementById('ytLoading').style.display = 'none';
+        addToHistory('Search YouTube', `Mencari video/lagu: ${query}`);
+
+        if (foundData) {
+            let html = '';
+            foundData.forEach(item => {
+                const title = item.title || item.videoTitle || "No Title";
+                const url = item.url || item.videoUrl || item.link || "";
+                const thumb = item.thumbnail || item.image || item.thumb || "https://via.placeholder.com/300x160?text=No+Image";
+                const dur = item.duration || item.timestamp || "";
+                const views = item.views || item.view || "";
+
+                if(url) {
+                    html += `
+                    <div class="yt-card" onclick="playYouTubeAudio('${url}', '${title.replace(/'/g, "\\'")}', '${thumb}')">
+                        <div style="position:relative;">
+                             <img src="${thumb}" class="yt-banner">
+                             <div class="yt-play-overlay"><i class="fas fa-play-circle yt-play-icon"></i></div>
+                        </div>
+                        <div class="yt-info">
+                            <div class="yt-title">${title}</div>
+                            <div class="yt-meta">
+                                <span>${dur}</span>
+                                <span>${views} views</span>
+                            </div>
+                        </div>
+                    </div>`;
+                }
+            });
+            document.getElementById('ytResultsArea').innerHTML = html;
+        } else {
+            document.getElementById('ytResultsArea').innerHTML = '<div style="text-align:center; color:#888; margin-top:20px;">Tidak ditemukan hasil. Coba lagi.</div>';
+        }
+    });
+
+    const globalAudio = document.getElementById('globalAudioPlayer');
+    const floatPlayer = document.getElementById('floatingPlayer');
+    const playBtn = document.getElementById('fpPlayBtn');
+
+    window.playYouTubeAudio = async (url, title, thumb) => {
+        floatPlayer.style.display = 'flex';
+        document.getElementById('fpThumb').src = thumb;
+        document.getElementById('fpTitle').innerText = title;
+        document.getElementById('fpStatus').innerText = "Fetching Audio Source...";
+        playBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        const downloadEndpoints = [
+            `https://restapi-v2.simplebot.my.id/download/ytmp3?url=${encodeURIComponent(url)}`,
+            `https://api.azz.biz.id/download/ytmp3?url=${encodeURIComponent(url)}`,
+            `https://yt-api.mojokertohost.xyz/download?url=${encodeURIComponent(url)}&type=mp3`
+        ];
+
+        let audioSrc = '';
+
+        for (let endpoint of downloadEndpoints) {
+            try {
+                const res = await fetch(endpoint);
+                const data = await res.json();
+                const dl = data.data?.download || data.result?.download?.url || data.result?.url || data.url || data.download;
+                if(dl) {
+                    audioSrc = dl;
+                    break;
+                }
+            } catch (e) { continue; }
+        }
+
+        if(audioSrc) {
+            globalAudio.src = audioSrc;
+            globalAudio.play();
+            document.getElementById('fpStatus').innerText = "Playing...";
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            playBtn.onclick = toggleAudio;
+            addToHistory('YouTube Playback', `Memutar audio: ${title.substring(0, 30)}...`);
+        } else {
+            document.getElementById('fpStatus').innerText = "Failed to load audio.";
+            playBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            showPopup('Gagal', 'Tidak dapat memutar audio', '❌');
+            addToHistory('YouTube Playback', `Gagal memutar audio: ${title.substring(0, 30)}...`);
+        }
+    };
+
+    function toggleAudio() {
+        if(globalAudio.paused) {
+            globalAudio.play();
+            playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            document.getElementById('fpStatus').innerText = "Playing...";
+            addToHistory('YouTube Playback', 'Audio dilanjutkan.');
+        } else {
+            globalAudio.pause();
+            playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            document.getElementById('fpStatus').innerText = "Paused";
+            addToHistory('YouTube Playback', 'Audio dijeda.');
+        }
+    }
+
+    window.stopAudio = () => {
+        globalAudio.pause();
+        globalAudio.currentTime = 0;
+        floatPlayer.style.display = 'none';
+        addToHistory('YouTube Playback', 'Audio dihentikan.');
+    };
+
+    function initDynamicRoleDropdown() {
+        const allowedRoles = ['member', 'vip', 'reseller', 'admin', 'owner', 'creator'];
+        const roleContainer = document.getElementById('roleOptions');
+        const roleText = document.getElementById('roleText');
+        const roleInput = document.getElementById('selectedRole');
+        const roleDisplayWrapper = document.getElementById('roleDisplay');
+
+        if (!roleContainer) return;
+
+        roleContainer.innerHTML = '';
+        allowedRoles.forEach(role => {
+            const div = document.createElement('div');
+            div.className = 'dropdown-option';
+            div.setAttribute('data-val', role);
+            div.innerText = role.charAt(0).toUpperCase() + role.slice(1);
+            div.addEventListener('click', () => {
+                roleText.innerText = div.innerText;
+                roleInput.value = role;
+                roleContainer.classList.remove('active');
+            });
+            roleContainer.appendChild(div);
+        });
+
+        if (allowedRoles.length > 0) {
+            const firstRole = allowedRoles[0];
+            roleText.innerText = firstRole.charAt(0).toUpperCase() + firstRole.slice(1);
+            roleInput.value = firstRole;
+        }
+
+        roleDisplayWrapper.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.bug-options-container.active, .dropdown-options-container.active').forEach(el => {
+                if (el.id !== 'roleOptions') el.classList.remove('active');
+            });
+            roleContainer.classList.toggle('active');
+        });
+    }
+  </script>
+</body>
+</html>
