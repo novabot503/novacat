@@ -9,5 +9,5 @@ module.exports = {
     GITHUB_TOKEN: "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",
     GITHUB_REPO: "novabot503/novacat",
     GITHUB_BRANCH: "main",
-    GITHUB_PATH: "uploads"
+    GITHUB_PATH: "file"
 };
