@@ -6,7 +6,7 @@ module.exports = {
     DEVELOPER: '@Novabot403',
     VERSI_WEB: '1.0',
     URL: 'https://novacat-two.vercel.app',
-    GITHUB_TOKEN: "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",
+    GITHUB_TOKEN: "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",
     GITHUB_REPO: "novabot503/novacat",
     GITHUB_BRANCH: "main",
     GITHUB_PATH: "uploads"
